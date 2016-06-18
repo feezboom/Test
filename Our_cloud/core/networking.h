@@ -85,6 +85,7 @@ long receive_file(int sock, void** pointer_to_alloc)
     received_bytes = recv_all(sock, *pointer_to_alloc, file_size, 0);
     if (received_bytes < file_size) {
         throw_error("receiving file", sock);
+        free(*pointer_to_alloc);
         return -1;
     }
 

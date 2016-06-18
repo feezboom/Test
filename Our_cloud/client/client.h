@@ -39,6 +39,10 @@ void parse(char* cmd, int sock) {
         fread(ptr, 1, size, new_file);
         send_file(sock, ptr, size);
     }
+    if (!strcasecmp(type, "download")) {
+        char* filename = strtok(NULL, " \n\0");
+        char path[1024];
+    }
 }
 
 int client_processing(int sock) {

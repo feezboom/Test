@@ -14,7 +14,9 @@
 #define DIR_LIST_MAX_BUF_SIZE 16384
 #define FULL_PATH_MAX_SIZE 1024
 
-char* get_current_dir() {
+char* get_current_dir_path() {
+    // Берет значение переменной окружения - PWD.
+    // Именно в этой переменной хранится путь к текущей директории.
     return getenv("PWD");
 }
 
@@ -30,7 +32,7 @@ int is_dir(char* filename, char* path) {
 }
 
 void get_dir_list(char* future_dir_list) {
-    char* current_path = get_current_dir();
+    char* current_path = get_current_dir_path();
     strcpy(future_dir_list, "");
 
     DIR* directory = opendir(current_path);
@@ -56,6 +58,16 @@ void get_dir_list(char* future_dir_list) {
         }
     }
     closedir(directory);
+}
+
+long get_file_size(char* full_path) {
+    struct stat file_info;
+    int result = lstat(full_path, &file_info);
+    if (result == -1) {
+        fprintf(stderr, "Can't get file size : %s\n", full_path);
+        return -1;
+    }
+    return file_info.st_size;
 }
 
 #endif //OUR_CLOUD_FILES_H

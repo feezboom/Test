@@ -4,6 +4,8 @@
 
 #define DEFAULT_PORT 2288
 
+#define server
+
 #include "core/cloud.h"
 
 // На вход подаются места для хранения - наши узлы (nodes)
