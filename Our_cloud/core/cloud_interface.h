@@ -16,6 +16,18 @@ void perform_download(int sock, char* fullpath_from) {
 }
 
 void perform_upload(int sock, char* fullpath_to, char* filename) {
+    void* file;
+    long received = receive_file(sock, &file);
+    if (received == -1) {
+        return;
+    }
+    char full_name[FULL_PATH_MAX_SIZE];
+    sprintf(full_name, "%s/%s", fullpath_to, filename);
+    FILE* new_file = fopen(full_name, "wb");
+    fwrite(file, 1, received, new_file);
+    fclose(new_file);
+    free(file);
+    send_message("Successfully uploaded.\n", sock);
     // todo
 }
 

@@ -105,7 +105,7 @@ void start_handling_client_requests(int sock) {
             sprintf(full_path, "%s/%s", current_dir, filename);
             perform_download(sock, full_path);
         } else if (!strcasecmp(upload, request_type)) {
-            char* filename = strtok(NULL, "\0\n ");
+            char* filename = strtok(NULL, "\n\0");
             sprintf(full_path, "%s", current_dir);
             perform_upload(sock, full_path, filename);
         } else if (!strcasecmp(finish, request_type)) {

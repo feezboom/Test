@@ -13,10 +13,33 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <errno.h>
-#include "../core/networking.h"
+#include <sys/stat.h>
+#include "../core/cloud.h"
 
 
 void clean_all() {};
+
+void parse(char* cmd, int sock) {
+    char* type = strtok(cmd, " \n\0");
+    if (!strcasecmp(type, "upload")) {
+        char* filename = strtok(NULL, " \n\0");
+        char path[1024];
+        getcwd(path, sizeof(path));
+        strcat(path, "/");
+        strcat(path, filename);
+
+        FILE* new_file = fopen(path, "rb");
+        struct stat st;
+        if (lstat(filename, &st) == -1) {
+            fprintf(stderr, "No such file\n");
+            return;
+        };
+        long size = st.st_size;
+        void* ptr = malloc(size);
+        fread(ptr, 1, size, new_file);
+        send_file(sock, ptr, size);
+    }
+}
 
 int client_processing(int sock) {
     char cmd[10000];
@@ -29,6 +52,7 @@ int client_processing(int sock) {
         send_all(sock, &size, sizeof(int), 0);
         // sending data
         send_all(sock, cmd, strlen(cmd), 0);
+        parse(cmd, sock);
         char buffer[16384];
         receive_message(buffer, sock);
         printf(buffer);
@@ -63,5 +87,6 @@ int run_client(int argc, char** argv) {
     printf("Подключение успешно :)\n");
     return client_socket;
 }
+
 
 #endif //CLIENT_CLIENT_H

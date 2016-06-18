@@ -11,7 +11,7 @@
 
 
 // получение заранее известного числа байт
-int recv_all(int sfd, void* buf, int len, int flags) {
+int recv_all(int sfd, void* buf, long len, int flags) {
     int total = 0;
     while(total < len)
     {
@@ -26,7 +26,7 @@ int recv_all(int sfd, void* buf, int len, int flags) {
 }
 
 // отправка заранее известного числа байт
-int send_all(int sfd, void* buf, int len, int flags)
+int send_all(int sfd, void* buf, long len, int flags)
 {
     int total = 0;
     while(total < len)
@@ -71,19 +71,19 @@ int send_message(char* str, int sock) {
     return bytes_sended;
 }
 
-int receive_file(int sock, void* pointer_where_to_alloc)
+long receive_file(int sock, void** pointer_to_alloc)
 {
     long file_size;
-    int result = recv_all(sock, &file_size, sizeof(int), 0);
-    if (result != 4) {
+    long received_bytes = recv_all(sock, &file_size, sizeof(long), 0);
+    if (received_bytes != sizeof(long)) {
         throw_error("receiving file_size", sock);
         return -1;
     }
     assert(file_size > 0);
 
-    pointer_where_to_alloc = malloc((unsigned long)file_size);
-    result = recv_all(sock, pointer_where_to_alloc, file_size, 0);
-    if (result < file_size) {
+    *pointer_to_alloc = malloc((unsigned long)file_size);
+    received_bytes = recv_all(sock, *pointer_to_alloc, file_size, 0);
+    if (received_bytes < file_size) {
         throw_error("receiving file", sock);
         return -1;
     }
@@ -91,4 +91,24 @@ int receive_file(int sock, void* pointer_where_to_alloc)
 
     return received_bytes;
 }
+
+long send_file(int sock, void* data, long file_size)
+{
+    long sent_bytes = send_all(sock, &file_size, sizeof(long), 0);
+    if (sent_bytes != sizeof(long)) {
+        throw_error("sending file_size", sock);
+        return -1;
+    }
+    assert(file_size > 0);
+
+    sent_bytes = send_all(sock, data, file_size, 0);
+    if (sent_bytes < file_size) {
+        throw_error("sending file", sock);
+        return -1;
+    }
+
+    return sent_bytes;
+}
+
+
 #endif //OUR_CLOUD_NETWORKING_H

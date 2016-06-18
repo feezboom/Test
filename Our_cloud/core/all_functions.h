@@ -24,8 +24,8 @@ int* run_threads(int threads_number, int* our_pipe);
 void* thread_processing(void* our_pipe);
 
 // Networking
-int recv_all(int sfd, void* buf, int len, int flags);
-int send_all(int sfd, void* buf, int len, int flags);
+int recv_all(int sfd, void* buf, long len, int flags);
+int send_all(int sfd, void* buf, long len, int flags);
 int receive_message(char* str, int sock);
 int send_message(char* str, int sock);
 
