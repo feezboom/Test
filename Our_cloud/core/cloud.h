@@ -19,11 +19,12 @@
 #define BUF_SIZE 1024
 
 // commands
-static const char get_list[] = "0";
-static const char download[] = "1";
-static const char upload[] = "2";
-static const char finish[] = "3";
-
+#define get_list "0"
+#define download "1"
+#define upload "2"
+#define finish "3"
+#define delete_ "4"
+#define deactivate "5"
 
 
 // Файл, который будет загружаться на сервер, будет попадать
@@ -66,12 +67,20 @@ void update_node(node* node_, char* dest, int id, int pair_id) {
     node_->id = id;
     node_->pair_id = pair_id;
 }
+void remove_node(int node_id){
+    for (i = node_id; i < storage_size - 1; i++){
+        (storage + i)->destination = (storage + i + 1)->destination;
+    }
+    realloc(storage, (storage_size - 1) * sizeof(node));
+    --storage_size;
+}
 void init_storage(int number, char** destinations) {
     storage = (node*)malloc(number*sizeof(node));
     for (i = 0; i < number; ++i) {
         update_node(storage+i, destinations[i+1], i, (i+1) % number);
     }
     storage_size = number-1;
+    create_duplicates_directories();
 }
 
 
@@ -105,7 +114,7 @@ void start_handling_client_requests(int sock) {
 
             char filename[1024];
             receive_message(filename, sock);
-            perform_download(sock, current_dir, filename);
+            perform_download(sock, filename);
 
         } else if (!strcasecmp(upload, handled_message)) { // upload
 
@@ -117,6 +126,15 @@ void start_handling_client_requests(int sock) {
             // С этим клиентом - всё.
             // Будем подбирать следующего в thread_processing
             return;
+        } else if (!strcasecmp(delete_, handled_message)) { // delete
+            char filename[1024];
+            receive_message(filename, sock);
+            perform_delete(sock, filename);
+        } else if (!strcasecmp(deactivate, handled_message)) {
+            char node_id[1024];
+            receive_message(node_id, sock);
+            perform_deactivate(node_id, sock);
+
         } else {
             fprintf(stderr, "Недопустимое действие (\"%s\") со стороны sock_fd = %d.\n", handled_message, sock);
         }

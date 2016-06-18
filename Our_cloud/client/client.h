@@ -79,7 +79,7 @@ void parse(char* cmd, int sock) {
         long size = receive_file(sock, &content);
 
         FILE* file = fopen(path, "wb");
-        fwrite(content, 1, size, file);
+        fwrite(content, 1, (unsigned long)size, file);
         fclose(file);
         free(content);
 
@@ -88,6 +88,34 @@ void parse(char* cmd, int sock) {
         receive_message(buffer, sock);
         printf(buffer);
         return;
+    }
+    if (!strcasecmp(type, "delete")) {
+        char res[1024];
+        char* filename = strtok(NULL, " \n\0");
+
+        send_message("4", sock);
+        send_message(filename, sock);
+        receive_message(res, sock); // Ответ - (OK/FAIL)
+
+        if (!strcasecmp("FAIL", res)) {
+            receive_message(res, sock); // Ответ - Причина
+            printf(res);
+            return;
+        }
+
+        // Server answer.
+        char buffer[16384];
+        receive_message(buffer, sock);
+        printf(buffer);
+        return;
+    }
+    if (!strcasecmp(type, "deactivate")) { // Отключить сервер i (deactivate i)
+        char res[1024];
+        char* server_no = strtok(NULL, " \n\0");
+        send_message("5", sock);
+        send_message(server_no, sock);
+        receive_message(res, sock);
+        printf(res);
     }
 }
 

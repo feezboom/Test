@@ -5,17 +5,23 @@
 #ifndef OUR_CLOUD_CLOUD_INTERFACE_H
 #define OUR_CLOUD_CLOUD_INTERFACE_H
 
+#include "files.h"
+#include "networking.h"
+#include "cloud.h"
+
+
 void perform_getlist(int sock) {
     char dir_list_to_send[DIR_LIST_MAX_BUF_SIZE];
-    get_dir_list(dir_list_to_send);
+    get_full_dir_list(dir_list_to_send);
     send_message(dir_list_to_send, sock);
 }
 
-void perform_download(int sock, char* path, char* filename) {
+void perform_download(int sock, char* filename) {
     // Читаем его
-    char full_path[FULL_PATH_MAX_SIZE];
-    sprintf(full_path, "%s/%s", path, filename);
-    FILE* file = fopen(full_path, "rb");
+    int node_id = chose_node(filename);
+    char path[FULL_PATH_MAX_SIZE];
+    sprintf(path, "%s/%s", storage[node_id].destination, filename);
+    FILE* file = fopen(path, "rb");
     if (!file) {
         // Первый send_message() это обязательно либо OK, либо FAIL
         // Это как идентификатор успеха:
@@ -40,7 +46,7 @@ void perform_download(int sock, char* path, char* filename) {
         send_message("No such file on cloud\n", sock);
         return;
     }
-    long size = get_file_size(full_path);
+    long size = get_file_size(path);
     if (size == -1) {
         send_message("FAIL", sock);
         send_message("internal server error\n", sock);
@@ -101,9 +107,61 @@ void perform_upload(int sock, char* filename) {
 
     // Шлём сообщение об успехе.
     // Отправим отчёт клиенту о том, что файл успешно загружен.
-#ifdef server
     send_message("Successfully uploaded.\n", sock);
-#endif
+}
+
+void perform_delete(int sock, char* filename) {
+    int node_id = chose_node(filename);
+    char path1[FULL_PATH_MAX_SIZE];
+    char path2[FULL_PATH_MAX_SIZE];
+    sprintf(path1, "%s/%s", storage[node_id].destination, filename);
+    sprintf(path2, "%s/duplicates/%s", storage[(node_id + 1) % storage_size].destination, filename);
+
+    int result = remove(path1);
+    if (result == -1) {
+        send_message("FAIL", sock);
+        send_message("No such file on server to delete!\n", sock);
+        return;
+    }
+    result = remove(path2);
+    if (result == -1) {
+        send_message("FAIL", sock);
+        send_message("Duplicate delete problem!\n", sock);
+        return;
+    }
+    send_message("OK", sock);
+    send_message("Successfully removed from the server!\n", sock);
+    return;
+}
+
+void perform_deactivate(char* node_id, int sock) {
+    int id = atoi(node_id);
+    if (id >= storage_size || id < 0) {
+        send_message("wrong input", sock);
+        return;
+    }
+    char* path = storage[id].destination;
+    clean_directory(path);
+    remove_node(id);
+
+    const char* path_next = storage[(id+1)%storage_size].destination;
+    char path_next_dup[FULL_PATH_MAX_SIZE]; // Путь к дубликатам i+1
+    const char* path_prev = storage[(id-1)%storage_size].destination;
+    char path_prev_dup[FULL_PATH_MAX_SIZE]; // Путь к дубликатам i-1
+
+    sprintf(path_next_dup, "%s/duplicates", path_next);
+    sprintf(path_prev_dup, "%s/duplicates", path_prev);
+
+    char prev_dup_list[DIR_LIST_MAX_BUF_SIZE]; // Список дубликатов в i-1
+    char next_dup_list[DIR_LIST_MAX_BUF_SIZE]; // Список дубликатов в i+1
+
+    get_dir_list(prev_dup_list, path_prev_dup);
+    get_dir_list(next_dup_list, path_next_dup);
+
+    // (1) Все дубликаты из i+1 скопировать в i-1
+    // (2) Все не дубликаты из i-1 скопировать в дубликаты i+1
+
+
 
 }
 

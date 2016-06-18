@@ -30,7 +30,7 @@ int receive_message(char* str, int sock);
 int send_message(char* str, int sock);
 
 // Files
-void get_dir_list(char* buffer);
+void get_dir_list(char* future_dir_list, const char* current_path_);
 
 // Error function
 void throw_error(char* message, int sock) {
