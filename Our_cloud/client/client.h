@@ -43,6 +43,7 @@ void parse(char* cmd, int sock) {
 
 int client_processing(int sock) {
     char cmd[10000];
+
     while (strcmp(cmd, "exit")) {
         printf("Введите действие --> ");
         fgets (cmd, 10000, stdin);

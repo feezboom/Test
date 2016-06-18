@@ -57,18 +57,18 @@ int receive_message(char* str, int sock) {
 }
 
 int send_message(char* str, int sock) {
-    int size = strlen(str);
-    int bytes_sended = send_all(sock, &size, sizeof(int), 0);
-    if (bytes_sended == -1) {
+    size_t size = strlen(str);
+    int bytes_sent = send_all(sock, &size, sizeof(int), 0);
+    if (bytes_sent == -1) {
         return -1;
     }
 
-    bytes_sended = send_all(sock, str, size, 0);
-    if (bytes_sended == -1) {
+    bytes_sent = send_all(sock, str, size, 0);
+    if (bytes_sent == -1) {
         return -1;
     }
 
-    return bytes_sended;
+    return bytes_sent;
 }
 
 long receive_file(int sock, void** pointer_to_alloc)
