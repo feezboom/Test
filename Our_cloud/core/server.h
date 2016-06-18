@@ -8,10 +8,13 @@
 #define THREADS_NUMBER 2
 
 #include <pthread.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <assert.h>
+#include "cloud.h"
 
 
-void* thread_processing(void* our_pipe)
-{
+void* thread_processing(void* our_pipe) {
 //Здесь описано ожидание потоком момента, пока в пайп
 //не будут записаны данные, и соответственно чтение этих данных
     int read_fd = ((int*)our_pipe)[0];
@@ -34,8 +37,7 @@ void* thread_processing(void* our_pipe)
     }
 }
 
-int* run_threads(int threads_number, int* our_pipe)
-{
+int* run_threads(int threads_number, int* our_pipe) {
     assert(threads_number > 0);
     pipe(our_pipe);
 
@@ -47,7 +49,6 @@ int* run_threads(int threads_number, int* our_pipe)
     }
     return our_pipe;
 }
-
 
 int prepare_server(uint16_t port) {
     // Инициализация параметров инициализации сокета

@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+#define BUF_SIZE 1024
 
 // получение заранее известного числа байт
 int recv_all(int sfd, void* buf, long len, int flags) {
@@ -71,8 +72,7 @@ int send_message(char* str, int sock) {
     return bytes_sent;
 }
 
-long receive_file(int sock, void** pointer_to_alloc)
-{
+long receive_file(int sock, void** pointer_to_alloc) {
     long file_size;
     long received_bytes = recv_all(sock, &file_size, sizeof(long), 0);
     if (received_bytes != sizeof(long)) {
@@ -93,8 +93,7 @@ long receive_file(int sock, void** pointer_to_alloc)
     return received_bytes;
 }
 
-long send_file(int sock, void* data, long file_size)
-{
+long send_file(int sock, void* data, long file_size) {
     long sent_bytes = send_all(sock, &file_size, sizeof(long), 0);
     if (sent_bytes != sizeof(long)) {
         throw_error("sending file_size", sock);

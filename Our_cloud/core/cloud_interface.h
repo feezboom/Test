@@ -8,7 +8,15 @@
 #include "files.h"
 #include "networking.h"
 #include "cloud.h"
+#include "storage.h"
 
+// commands
+#define get_list "0"
+#define download "1"
+#define upload "2"
+#define finish "3"
+#define delete_ "4"
+#define deactivate "5"
 
 void perform_getlist(int sock) {
     char dir_list_to_send[DIR_LIST_MAX_BUF_SIZE];

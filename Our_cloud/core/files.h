@@ -5,24 +5,18 @@
 #ifndef OUR_CLOUD_FILES_H
 #define OUR_CLOUD_FILES_H
 
+
+#include <sys/stat.h>
+#include <assert.h>
+#include <memory.h>
+#include <dirent.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
-#include <stdlib.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <memory.h>
-#include <stdio.h>
+#include "storage.h"
 
 #define DIR_LIST_MAX_BUF_SIZE 16384
 #define FULL_PATH_MAX_SIZE 1024
-
-void get_current_dir_path(char *path) {
-    // Берет значение переменной окружения - PWD.
-    // Именно в этой переменной хранится путь к текущей директории.
-    getcwd(path, FULL_PATH_MAX_SIZE);
-    return;
-}
 
 int is_dir(char* filename, char* path) {
     char full_path[1024];
@@ -35,6 +29,7 @@ int is_dir(char* filename, char* path) {
     return S_ISDIR(item_info.st_mode);
 }
 
+// Возвращает список файлов в папке, без внутренних папок
 void get_dir_list(char* future_dir_list, const char* current_path_) {
     char current_path[FULL_PATH_MAX_SIZE];
     sprintf(current_path, current_path_);
@@ -66,8 +61,8 @@ void get_dir_list(char* future_dir_list, const char* current_path_) {
     closedir(directory);
 }
 
-
-void get_full_dir_list(char * future_full_list){
+// Возвращает список файлов по всем узлам хранилища
+void get_full_dir_list(char * future_full_list) {
 //int i;
     strcpy(future_full_list, "");
     char part_full_list[DIR_LIST_MAX_BUF_SIZE];
@@ -87,11 +82,6 @@ long get_file_size(const char* full_path) {
         return -1;
     }
     return file_info.st_size;
-}
-
-// Возвращает id узла по хэшу
-int chose_node(const char *filename) {
-    return HashFAQ6(filename) % storage_size;
 }
 
 void create_duplicates_directories() {
@@ -162,7 +152,6 @@ int copy(const char *to, const char *from) {
     errno = saved_errno;
     return -1;
 }
-
 
 int remove_file(char* path, char* filename) {
     char temp[FULL_PATH_MAX_SIZE];

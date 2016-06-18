@@ -72,7 +72,7 @@ void parse(char* cmd, int sock) {
 
         char path[1024];
         char cur_dir[FULL_PATH_MAX_SIZE];
-        get_current_dir_path(cur_dir);
+        getcwd(cur_dir, FULL_PATH_MAX_SIZE);
         sprintf(path, "%s/%s", cur_dir, filename);
 
         void* content;
