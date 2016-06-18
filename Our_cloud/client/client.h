@@ -21,6 +21,7 @@ void clean_all() {};
 
 void parse(char* cmd, int sock) {
     char* type = strtok(cmd, " \n\0");
+    if (type == NULL) { return; }
     if (!strcasecmp(type, "upload")) {
         char* filename = strtok(NULL, " \n\0");
         char path[1024];
@@ -31,16 +32,25 @@ void parse(char* cmd, int sock) {
         FILE* new_file = fopen(path, "rb");
         struct stat st;
         if (lstat(filename, &st) == -1) {
-            fprintf(stderr, "No such file\n");
+            fprintf(stderr, "No such file (client)\n");
+            fflush(stderr);
             return;
         };
         long size = st.st_size;
         void* ptr = malloc(size);
         fread(ptr, 1, size, new_file);
+
+        send_message(cmd, sock);
         send_file(sock, ptr, size);
+
+        // Server answer.
+        char buffer[16384];
+        receive_message(buffer, sock);
+        printf(buffer);
     }
     if (!strcasecmp(type, "download")) {
         char res[10];
+        send_message(cmd, sock);
         receive_message(res, sock);
         if (!strcasecmp("FAIL", res)) {
             return;
@@ -59,29 +69,29 @@ void parse(char* cmd, int sock) {
         fwrite(content, 1, size, file);
         fclose(file);
         free(content);
+
+        // Server answer.
+        char buffer[16384];
+        receive_message(buffer, sock);
+        printf(buffer);
         return;
     }
 }
 
 int client_processing(int sock) {
     char cmd[10000];
-
+    printf("Введите действие --> ");
+    fgets (cmd, 10000, stdin);
     while (strcmp(cmd, "exit")) {
-        printf("Введите действие --> ");
-        fgets (cmd, 10000, stdin);
 //        printf("output command - %s\n", cmd);
         // sending size
-        send_message(cmd, sock);
         parse(cmd, sock);
-        // Server answer.
-        char buffer[16384];
-        receive_message(buffer, sock);
-        printf(buffer);
+        printf("Введите действие --> ");
+        fgets (cmd, 10000, stdin);
     }
     printf("Клиент завершил свою работу...\n");
     return 0;
 }
-
 
 int run_client(int argc, char** argv) {
     if (argc < 2) {
