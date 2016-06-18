@@ -19,10 +19,10 @@
 #define BUF_SIZE 1024
 
 // commands
-static const char get_list[] = "getlist";
-static const char download[] = "download";
-static const char upload[] = "upload";
-static const char finish[] = "finish";
+static const char get_list[] = "0";
+static const char download[] = "1";
+static const char upload[] = "2";
+static const char finish[] = "3";
 
 
 
@@ -90,24 +90,25 @@ void start_handling_client_requests(int sock) {
         char handled_message[BUF_SIZE];
         receive_message(handled_message, sock);
 
-        char* request_type = strtok(handled_message, " \n\0");
-        if (request_type == NULL || !strcmp("", request_type)) {
+
+        if (handled_message == NULL || !strcmp("", handled_message)) {
             // Клиент отключился?
             printf("Клиент (sock_fd = %d) отключился?\n", sock);
             return;
         }
 
-        if (!strcasecmp(get_list, request_type)) {
+        if (!strcasecmp("0", handled_message)) {
             perform_getlist(sock);
-        } else if (!strcasecmp(download, request_type)) {
-            char* filename = strtok(NULL, "\n ");
+        } else if (!strcasecmp("1", handled_message)) {
+            char filename[1024];
+            receive_message(filename, sock);
             sprintf(full_path, "%s/%s", current_dir, filename);
             perform_download(sock, full_path);
-        } else if (!strcasecmp(upload, request_type)) {
+        } else if (!strcasecmp("2", handled_message)) {
             char* filename = strtok(NULL, "\n\0");
             sprintf(full_path, "%s/%s", current_dir, filename);
             perform_upload(sock, full_path);
-        } else if (!strcasecmp(finish, request_type)) {
+        } else if (!strcasecmp("3", handled_message)) {
             // С этим клиентом - всё.
             // Будем подбирать следующего в thread_processing
             return;
