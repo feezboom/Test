@@ -22,6 +22,13 @@ void clean_all() {};
 void parse(char* cmd, int sock) {
     char* type = strtok(cmd, " \n\0");
     if (type == NULL) { return; }
+    if (!strcasecmp(type, "getlist")) {
+        send_message(cmd, sock);
+        // Server answer.
+        char buffer[16384];
+        receive_message(buffer, sock);
+        printf(buffer);
+    }
     if (!strcasecmp(type, "upload")) {
         char* filename = strtok(NULL, " \n\0");
         char path[1024];
@@ -49,10 +56,12 @@ void parse(char* cmd, int sock) {
         printf(buffer);
     }
     if (!strcasecmp(type, "download")) {
-        char res[10];
+        char res[1024];
         send_message(cmd, sock);
         receive_message(res, sock);
         if (!strcasecmp("FAIL", res)) {
+            receive_message(res, sock);
+            printf(res);
             return;
         }
 

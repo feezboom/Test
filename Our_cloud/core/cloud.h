@@ -54,15 +54,12 @@ typedef struct node {
     int id;
     int pair_id;
     char* destination;
-
-    // Список личных файлов узла
-    char** files_list;
-    char** duplicates;
 } node;
 
 
 static int i,j;
 node* storage; // Динамическая память, выделяется в init_storage
+static int storage_size = -1;
 
 void update_node(node* node_, char* dest, int id, int pair_id) {
     node_->destination = dest;
@@ -74,6 +71,7 @@ void init_storage(int number, char** destinations) {
     for (i = 0; i < number; ++i) {
         update_node(storage+i, destinations[i], i, (i+1) % number);
     }
+    storage_size = number;
 }
 
 

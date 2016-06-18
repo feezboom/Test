@@ -72,4 +72,8 @@ long get_file_size(char* full_path) {
     return file_info.st_size;
 }
 
+int chose_dir(char* filename) {
+    return HashFAQ6(filename) % storage_size;
+}
+
 #endif //OUR_CLOUD_FILES_H
