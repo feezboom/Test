@@ -23,7 +23,7 @@ void parse(char* cmd, int sock) {
     char* type = strtok(cmd, " \n\0");
     if (type == NULL) { return; }
     if (!strcasecmp(type, "getlist")) {
-        send_message(cmd, sock);
+        send_message("0", sock);
         // Server answer.
         char buffer[16384];
         receive_message(buffer, sock);
@@ -47,7 +47,8 @@ void parse(char* cmd, int sock) {
         void* ptr = malloc(size);
         fread(ptr, 1, size, new_file);
 
-        send_message(cmd, sock);
+        send_message("2", sock);
+        send_message(filename, sock);
         send_file(sock, ptr, size);
 
         // Server answer.
@@ -57,15 +58,18 @@ void parse(char* cmd, int sock) {
     }
     if (!strcasecmp(type, "download")) {
         char res[1024];
-        send_message(cmd, sock);
-        receive_message(res, sock);
+        char* filename = strtok(NULL, " \n\0");
+
+        send_message("1", sock);
+        send_message(filename, sock);
+        receive_message(res, sock); // Ответ - (OK/FAIL)
+
         if (!strcasecmp("FAIL", res)) {
-            receive_message(res, sock);
+            receive_message(res, sock); // Ответ - Причина
             printf(res);
             return;
         }
 
-        char* filename = strtok(NULL, " \n\0");
         char path[1024];
         char cur_dir[FULL_PATH_MAX_SIZE];
         get_current_dir_path(cur_dir);

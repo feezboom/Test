@@ -11,9 +11,10 @@
     </ADDITIONAL_GENERATION_ENVIRONMENT>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c2acbc5-9c9b-467a-9440-d6452e694e5f" name="Default" comment="">
+    <list default="true" id="8c2acbc5-9c9b-467a-9440-d6452e694e5f" name="Default" comment="some3">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../core/cloud.h" afterPath="$PROJECT_DIR$/../core/cloud.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client.h" afterPath="$PROJECT_DIR$/client.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../core/cloud_interface.h" afterPath="$PROJECT_DIR$/../core/cloud_interface.h" />
     </list>
     <ignored path="client.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -57,11 +58,11 @@
       <file leaf-file-name="client.h" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/client.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="362">
-              <caret line="38" column="43" selection-start-line="38" selection-start-column="43" selection-end-line="38" selection-end-column="43" />
+            <state relative-caret-position="912">
+              <caret line="87" column="38" selection-start-line="87" selection-start-column="38" selection-end-line="87" selection-end-column="38" />
               <folding>
                 <element signature="e#87#110#0" expanded="true" />
-                <element signature="e#2584#3318#0" expanded="false" />
+                <element signature="e#2702#3436#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -400,7 +401,8 @@
     <MESSAGE value="server downloading" />
     <MESSAGE value="upload/download works" />
     <MESSAGE value="some" />
-    <option name="LAST_COMMIT_MESSAGE" value="some" />
+    <MESSAGE value="some3" />
+    <option name="LAST_COMMIT_MESSAGE" value="some3" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -431,7 +433,7 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#87#110#0" expanded="true" />
-            <element signature="e#2584#3318#0" expanded="false" />
+            <element signature="e#2702#3436#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -466,7 +468,7 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#87#110#0" expanded="true" />
-            <element signature="e#2584#3318#0" expanded="false" />
+            <element signature="e#2702#3436#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -501,7 +503,7 @@
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
             <element signature="e#87#110#0" expanded="true" />
-            <element signature="e#2584#3318#0" expanded="false" />
+            <element signature="e#2702#3436#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -541,11 +543,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/client.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="362">
-          <caret line="38" column="43" selection-start-line="38" selection-start-column="43" selection-end-line="38" selection-end-column="43" />
+        <state relative-caret-position="912">
+          <caret line="87" column="38" selection-start-line="87" selection-start-column="38" selection-end-line="87" selection-end-column="38" />
           <folding>
             <element signature="e#87#110#0" expanded="true" />
-            <element signature="e#2584#3318#0" expanded="false" />
+            <element signature="e#2702#3436#0" expanded="false" />
           </folding>
         </state>
       </provider>
