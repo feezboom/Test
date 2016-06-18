@@ -12,6 +12,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8c2acbc5-9c9b-467a-9440-d6452e694e5f" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../core/cloud.h" afterPath="$PROJECT_DIR$/../core/cloud.h" />
     </list>
     <ignored path="client.iws" />

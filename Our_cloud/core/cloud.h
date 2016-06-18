@@ -97,23 +97,24 @@ void start_handling_client_requests(int sock) {
             return;
         }
 
-        if (!strcasecmp("0", handled_message)) {
+        if (!strcasecmp(get_list, handled_message)) {
             perform_getlist(sock);
-        } else if (!strcasecmp("1", handled_message)) {
+        } else if (!strcasecmp(download, handled_message)) {
             char filename[1024];
             receive_message(filename, sock);
             sprintf(full_path, "%s/%s", current_dir, filename);
             perform_download(sock, full_path);
-        } else if (!strcasecmp("2", handled_message)) {
-            char* filename = strtok(NULL, "\n\0");
+        } else if (!strcasecmp(upload, handled_message)) {
+            char filename[1024];
+            receive_message(filename, sock);
             sprintf(full_path, "%s/%s", current_dir, filename);
             perform_upload(sock, full_path);
-        } else if (!strcasecmp("3", handled_message)) {
+        } else if (!strcasecmp(finish, handled_message)) {
             // С этим клиентом - всё.
             // Будем подбирать следующего в thread_processing
             return;
         } else {
-            fprintf(stderr, "Недопустимое действие (\"%s\") со стороны sock_fd = %d.\n", request_type, sock);
+            fprintf(stderr, "Недопустимое действие (\"%s\") со стороны sock_fd = %d.\n", handled_message, sock);
         }
     }
 }
