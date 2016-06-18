@@ -146,23 +146,34 @@ void perform_deactivate(char* node_id, int sock) {
 
     const char* path_next = storage[(id+1)%storage_size].destination;
     char path_next_dup[FULL_PATH_MAX_SIZE]; // Путь к дубликатам i+1
+
+    const char* path_this = storage[id].destination;
+    char path_this_dup[FULL_PATH_MAX_SIZE]; // Путь к дубликатам i
+
     const char* path_prev = storage[(id-1)%storage_size].destination;
     char path_prev_dup[FULL_PATH_MAX_SIZE]; // Путь к дубликатам i-1
 
     sprintf(path_next_dup, "%s/duplicates", path_next);
+    sprintf(path_this_dup, "%s/duplicates", path_this);
     sprintf(path_prev_dup, "%s/duplicates", path_prev);
 
     char prev_dup_list[DIR_LIST_MAX_BUF_SIZE]; // Список дубликатов в i-1
-    char next_dup_list[DIR_LIST_MAX_BUF_SIZE]; // Список дубликатов в i+1
+    char this_dup_list[DIR_LIST_MAX_BUF_SIZE]; // Список дубликатов в i
+    char prev_list[DIR_LIST_MAX_BUF_SIZE]; // Список файлов предыдущего узла
 
     get_dir_list(prev_dup_list, path_prev_dup);
-    get_dir_list(next_dup_list, path_next_dup);
+    get_dir_list(this_dup_list, path_this_dup);
+    get_dir_list(prev_list, path_prev);
 
-    // (1) Все дубликаты из i+1 скопировать в i-1
-    // (2) Все не дубликаты из i-1 скопировать в дубликаты i+1
+    // Рисуночек перекидываний
 
+    copy_all(path_this_dup, path_this, this_dup_list); // Сделаем дубликат потерянного в следующем
+    copy_all(path_this_dup, path_next_dup, this_dup_list); // Восстановим из копий себе
+    clean_directory(path_this_dup); // Здесь должны лежать дубликаты предыдущего - они потерялись
+    copy_all(path_prev, path_this_dup, prev_list); // Дубликаты предыдущего лежат тут
 
-
+    send_message("Deactivation success!\n", sock);
+    return;
 }
 
 #endif //OUR_CLOUD_CLOUD_INTERFACE_H

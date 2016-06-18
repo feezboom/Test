@@ -170,47 +170,61 @@ int remove_file(char* path, char* filename) {
     return remove(temp);
 }
 
-
 // Копирует все файлы из списка(раделенных\n) из from в to
 void copy_all(const char* from, const char* to, const char* file_list) {
     char temp[DIR_LIST_MAX_BUF_SIZE];
     strcpy(temp, file_list);
     char* filename = strtok(temp, "\n\0");
     while (filename != NULL) {
-
+        char old[FULL_PATH_MAX_SIZE];
+        char new_[FULL_PATH_MAX_SIZE];
+        sprintf(old, "%s/%s", from, filename);
+        sprintf(new_, "%s/%s", to, filename);
+        copy(new_, old);
+        filename = strtok(NULL, "\n\0");
     }
 }
 
-void clean_directory(char* path) {
-    DIR* directory = opendir(path);
-    struct dirent* item;
-    while(NULL != (item = readdir(directory))) {
-// ^^^
-// |||
-// Следующий элемент папки
+// Со stackoverflow
+int clean_directory(const char *path) {
+    DIR *d = opendir(path);
+    size_t path_len = strlen(path);
+    int r = -1;
 
-        char* item_name = item->d_name;
-        if(!strcmp(item_name, ".") ||
-           !strcmp(item_name, "..") || (item_name[0] == '.')) {
-// Если это текущая директория (.),
-// либо родительская (..),
-// либо начинается с точки - значит скрытая (.*),
-// то её показывать никому не надо.
-            continue;
-        }
+    if (d) {
+        struct dirent *p;
+        r = 0;
+        while (!r && (p=readdir(d))) {
+            int r2 = -1;
+            char *buf;
+            size_t len;
 
-        if (!is_dir(item_name, path)) {
-            char path_to_remove[10000];
-            sprintf(path_to_remove, path);
-            strcat(path_to_remove, item_name);
-            remove(path_to_remove);
+            /* Skip the names "." and ".." as we don't want to recurse on them. */
+            if (!strcmp(p->d_name, ".") || !strcmp(p->d_name, "..")) {
+                continue;
+            }
+
+            len = path_len + strlen(p->d_name) + 2;
+            buf = malloc(len);
+
+            if (buf) {
+                struct stat statbuf;
+                snprintf(buf, len, "%s/%s", path, p->d_name);
+                if (!stat(buf, &statbuf)) {
+                    if (S_ISDIR(statbuf.st_mode)) {
+                        r2 = clean_directory(buf);
+                    } else {
+                        r2 = unlink(buf);
+                    }
+                }
+                free(buf);
+            }
+            r = r2;
         }
+        closedir(d);
     }
-    closedir(directory);
-    char path_duplicate[10000];
-    char * duplicates = "/duplicates";
-    sprintf(path_duplicate, "%s%s", path, duplicates);
-    rmdir(path_duplicate);
+
+    return r;
 }
 
 #endif //OUR_CLOUD_FILES_H
