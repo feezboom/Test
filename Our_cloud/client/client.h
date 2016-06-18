@@ -40,8 +40,26 @@ void parse(char* cmd, int sock) {
         send_file(sock, ptr, size);
     }
     if (!strcasecmp(type, "download")) {
+        char res[10];
+        receive_message(res, sock);
+        if (!strcasecmp("FAIL", res)) {
+            return;
+        }
+
         char* filename = strtok(NULL, " \n\0");
         char path[1024];
+        char cur_dir[FULL_PATH_MAX_SIZE];
+        get_current_dir_path(cur_dir);
+        sprintf(path, "%s/%s", cur_dir, filename);
+
+        void* content;
+        long size = receive_file(sock, &content);
+
+        FILE* file = fopen(path, "wb");
+        fwrite(content, 1, size, file);
+        fclose(file);
+        free(content);
+        return;
     }
 }
 
@@ -53,11 +71,9 @@ int client_processing(int sock) {
         fgets (cmd, 10000, stdin);
 //        printf("output command - %s\n", cmd);
         // sending size
-        size_t size = strlen(cmd);
-        send_all(sock, &size, sizeof(int), 0);
-        // sending data
-        send_all(sock, cmd, strlen(cmd), 0);
+        send_message(cmd, sock);
         parse(cmd, sock);
+        // Server answer.
         char buffer[16384];
         receive_message(buffer, sock);
         printf(buffer);

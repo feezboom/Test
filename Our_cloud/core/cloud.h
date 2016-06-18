@@ -85,7 +85,8 @@ void init_storage(int number, char** destinations) {
 // с сокетом sock
 void start_handling_client_requests(int sock) {
     char full_path[FULL_PATH_MAX_SIZE];
-    const char* current_dir = get_current_dir_path();
+    char current_dir[FULL_PATH_MAX_SIZE];
+    get_current_dir_path(current_dir);
 
     while (1) {
         char handled_message[BUF_SIZE];
@@ -101,7 +102,7 @@ void start_handling_client_requests(int sock) {
         if (!strcasecmp(get_list, request_type)) {
             perform_getlist(sock);
         } else if (!strcasecmp(download, request_type)) {
-            char* filename = strtok(NULL, "\0\n ");
+            char* filename = strtok(NULL, "\n ");
             sprintf(full_path, "%s/%s", current_dir, filename);
             perform_download(sock, full_path);
         } else if (!strcasecmp(upload, request_type)) {

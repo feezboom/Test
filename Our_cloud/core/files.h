@@ -14,10 +14,11 @@
 #define DIR_LIST_MAX_BUF_SIZE 16384
 #define FULL_PATH_MAX_SIZE 1024
 
-char* get_current_dir_path() {
+void get_current_dir_path(char *path) {
     // Берет значение переменной окружения - PWD.
     // Именно в этой переменной хранится путь к текущей директории.
-    return getenv("PWD");
+    getcwd(path, FULL_PATH_MAX_SIZE);
+    return;
 }
 
 int is_dir(char* filename, char* path) {
@@ -32,7 +33,8 @@ int is_dir(char* filename, char* path) {
 }
 
 void get_dir_list(char* future_dir_list) {
-    char* current_path = get_current_dir_path();
+    char current_path[FULL_PATH_MAX_SIZE];
+    get_current_dir_path(current_path);
     strcpy(future_dir_list, "");
 
     DIR* directory = opendir(current_path);

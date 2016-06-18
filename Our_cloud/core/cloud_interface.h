@@ -16,33 +16,59 @@ void perform_download(int sock, char* full_path) {
     FILE* file = fopen(full_path, "rb");
     if (!file) {
 #ifdef server
-        send_message("No such file on cloud", sock);
+        // Первый send_message() это обязательно либо OK, либо FAIL
+        // Это как идентификатор успеха:
+
+        // Клиент отправляет запрос upload bla.bla
+        // - Сервер получает запрос
+        // - Парсит его
+        // - Видит upload
+        // - Пробует найти этот файл
+        // - Если что-то не так (файл не найден или что-то ещё), то
+        // есть по каким-то причинам файл отправить не получится
+        // Сервер отправляет клиенту "FAIL", и после сообщение почему FAIL
+        // - Если все идёт по плану, то сервер отправит клиенту "OK",
+        // а после и сам файл.
+
+        // Клиент же:
+        // - Отправляет запрос
+        // - Получает ответ в виде "OK"/"FAIL"
+        // - Если "OK" - то принимает файл
+        // - Если "FAIL" - то файл не принимает,
+        // а принимает только сообщение об ошибке, которое отправил сервер.
+        send_message("FAIL", sock);
+        send_message("No such file on cloud\n", sock);
 #endif
         return;
     }
     long size = get_file_size(full_path);
     if (size == -1) {
+        send_message("FAIL", sock);
+        send_message("internal server error\n", sock);
         throw_error("problem getting file_size (download)", sock);
         fclose(file);
         return;
     }
     void *content = malloc((unsigned long)size);  // Выделяем память для загрузки файла в память.
     if (content == NULL) {
+        send_message("FAIL", sock);
+        send_message("internal server error\n", sock);
         throw_error("malloc problem", -1);
-        fclose(file);
-        return;
-    }
-    fread(content, 1, (unsigned long)size, file); // Читаем файл в память.
-    long result = send_file(sock, content, size); // Отправляем уже из памяти.
-
-    if (result != size) {
-        throw_error("sending file problem", sock);
-        free(content);
         fclose(file);
         return;
     }
 
     send_message("OK", sock);
+    fread(content, 1, (unsigned long)size, file); // Читаем файл в память.
+    long result = send_file(sock, content, size); // Отправляем уже из памяти.
+
+    if (result != size) {
+        throw_error("sending file problem\n", sock);
+        free(content);
+        fclose(file);
+        return;
+    }
+    send_message("Successfully sent\n", sock);
     free(content);
     fclose(file);
 }
