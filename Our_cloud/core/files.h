@@ -72,8 +72,11 @@ long get_file_size(char* full_path) {
     return file_info.st_size;
 }
 
-int chose_dir(char* filename) {
+int chose_node(char *filename) {
     return HashFAQ6(filename) % storage_size;
 }
 
+void create_dir(char* dir_name) {
+    // todo
+}
 #endif //OUR_CLOUD_FILES_H

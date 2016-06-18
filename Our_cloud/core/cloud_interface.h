@@ -11,11 +11,12 @@ void perform_getlist(int sock) {
     send_message(dir_list_to_send, sock);
 }
 
-void perform_download(int sock, char* full_path) {
+void perform_download(int sock, char* path, char* filename) {
     // Читаем его
+    char full_path[FULL_PATH_MAX_SIZE];
+    sprintf(full_path, "%s/%s", path, filename);
     FILE* file = fopen(full_path, "rb");
     if (!file) {
-#ifdef server
         // Первый send_message() это обязательно либо OK, либо FAIL
         // Это как идентификатор успеха:
 
@@ -37,7 +38,6 @@ void perform_download(int sock, char* full_path) {
         // а принимает только сообщение об ошибке, которое отправил сервер.
         send_message("FAIL", sock);
         send_message("No such file on cloud\n", sock);
-#endif
         return;
     }
     long size = get_file_size(full_path);
@@ -72,7 +72,7 @@ void perform_download(int sock, char* full_path) {
     fclose(file);
 }
 
-void perform_upload(int sock, char* full_path_to) {
+void perform_upload(int sock, char* filename) {
     void* content;
     // В receive_file в указатель content выделяется память в content
     // с помощью malloc, её нужно будет освободить.
@@ -80,12 +80,23 @@ void perform_upload(int sock, char* full_path_to) {
     if (received == -1) {
         return;
     }
+
+    int node_id = chose_node(filename);
+    char path1[FULL_PATH_MAX_SIZE];
+    char path2[FULL_PATH_MAX_SIZE];
+    sprintf(path1, "%s/%s", storage[node_id].destination, filename);
+    sprintf(path2, "%s/duplicates/%s", storage[(node_id + 1) % storage_size].destination, filename);
+
+
     // Создаём этот файл - открываем на запись.
-    FILE* new_file = fopen(full_path_to, "wb");
+    FILE* new_file = fopen(path1, "wb");
+    FILE* new_file_duplicate = fopen(path2, "wb");
     // Пишем в этот файл.
     fwrite(content, 1, (unsigned long)received, new_file);
+    fwrite(content, 1, (unsigned long)received, new_file_duplicate);
 
     fclose(new_file);
+    fclose(new_file_duplicate);
     free(content);
 
     // Шлём сообщение об успехе.

@@ -95,7 +95,7 @@ int client_processing(int sock) {
     char cmd[10000];
     printf("Введите действие --> ");
     fgets (cmd, 10000, stdin);
-    while (strcmp(cmd, "exit")) {
+    while (strcmp(cmd, "exit\n")) {
 //        printf("output command - %s\n", cmd);
         // sending size
         parse(cmd, sock);

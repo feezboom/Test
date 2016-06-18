@@ -69,9 +69,9 @@ void update_node(node* node_, char* dest, int id, int pair_id) {
 void init_storage(int number, char** destinations) {
     storage = (node*)malloc(number*sizeof(node));
     for (i = 0; i < number; ++i) {
-        update_node(storage+i, destinations[i], i, (i+1) % number);
+        update_node(storage+i, destinations[i+1], i, (i+1) % number);
     }
-    storage_size = number;
+    storage_size = number-1;
 }
 
 
@@ -97,19 +97,23 @@ void start_handling_client_requests(int sock) {
             return;
         }
 
-        if (!strcasecmp(get_list, handled_message)) {
+        if (!strcasecmp(get_list, handled_message)) { // getlist
+
             perform_getlist(sock);
-        } else if (!strcasecmp(download, handled_message)) {
+
+        } else if (!strcasecmp(download, handled_message)) { // download
+
             char filename[1024];
             receive_message(filename, sock);
-            sprintf(full_path, "%s/%s", current_dir, filename);
-            perform_download(sock, full_path);
-        } else if (!strcasecmp(upload, handled_message)) {
+            perform_download(sock, current_dir, filename);
+
+        } else if (!strcasecmp(upload, handled_message)) { // upload
+
             char filename[1024];
             receive_message(filename, sock);
-            sprintf(full_path, "%s/%s", current_dir, filename);
-            perform_upload(sock, full_path);
-        } else if (!strcasecmp(finish, handled_message)) {
+            perform_upload(sock, filename);
+
+        } else if (!strcasecmp(finish, handled_message)) { // exit
             // С этим клиентом - всё.
             // Будем подбирать следующего в thread_processing
             return;
