@@ -174,12 +174,12 @@ void perform_deactivate(char* node_id, int sock) {
     get_dir_list(prev_list, path_prev);
 
     // Рисуночек перекидываний
-
+    // todo
     copy_all(path_this_dup, path_this, this_dup_list); // Сделаем дубликат потерянного в следующем
     copy_all(path_this_dup, path_next_dup, this_dup_list); // Восстановим из копий себе
     clean_directory(path_this_dup); // Здесь должны лежать дубликаты предыдущего - они потерялись
     copy_all(path_prev, path_this_dup, prev_list); // Дубликаты предыдущего лежат тут
-
+    // todo
     send_message("Deactivation success!\n", sock);
     return;
 }
