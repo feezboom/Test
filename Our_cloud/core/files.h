@@ -218,5 +218,6 @@ int clean_directory(const char *path) {
 
 void make_duplicates_for_all() {}
 
+void rehash_after_remove() {}
 
 #endif //OUR_CLOUD_FILES_H
