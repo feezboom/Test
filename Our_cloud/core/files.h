@@ -220,7 +220,7 @@ void make_duplicates_for_all() {
 	char full_dir_list[FULL_PATH_MAX_SIZE];
 	get_full_dir_list(full_dir_list);
 	const char * duplicate = "duplicates";
-	for (i = 0; i < storage_size; i++){
+	for (i = 0; i < storage_size; i++) {
 		char cur_dup_dir[FULL_PATH_MAX_SIZE];
 		char cur_dir[FULL_PATH_MAX_SIZE];
 		sprintf(cur_dir, "%s", (storage + i)->destination);
@@ -230,19 +230,43 @@ void make_duplicates_for_all() {
 	}
 }
 void rehash_after_remove(int node_id) {
-		const char * duplicate = "duplicates";
-		char full_dir_list[FULL_PATH_MAX_SIZE];
-		get_full_dir_list(full_dir_list);
-		for (i = node_id; i < storage_size; i++){
-			clean_directory((storage + i)->destination);
-			char dup_dir[FULL_PATH_MAX_SIZE];
-			sprintf(dup_dir, "%s/%s", ((storage + i))->destination, duplicate);
-			copy_all(dup_dir, (storage + i)->destination, full_dir_list);
+    if (node_id == 0) {
+        int last_id = storage_size - 1;
+
+        char* last_node_path = storage[last_id].destination; // откуда
+        char first_node_dup_path[FULL_PATH_MAX_SIZE]; // куда
+        sprintf(first_node_dup_path, "%s/duplicates", storage[0].destination);
+
+        char last_node_dir_list[DIR_LIST_MAX_BUF_SIZE];
+        get_dir_list(last_node_dir_list, last_node_path); // что
+
+        copy_all(last_node_path, first_node_dup_path, last_node_dir_list);
+    }
+    // Будет храниться список файлов в текущей папке дубликатов.
+		char current_dup_dir_list[FULL_PATH_MAX_SIZE];
+		for (i = node_id; i < storage_size; i++) {
+            // Очистим папку
+            clean_directory(storage[i].destination);
+            // Построили путь к текущим копиям
+            char current_dup_path[FULL_PATH_MAX_SIZE];
+            sprintf(current_dup_path, "%s/duplicates", storage[i].destination);
+            // Получили список текущих копий
+            get_dir_list(current_dup_dir_list, current_dup_path);
+			// Копируем из копий в НЕкопии
+			copy_all(current_dup_path, storage[i].destination, current_dup_dir_list);
+            // Почистим папку дубликатов
 		}
-		char dup_dir[FULL_PATH_MAX_SIZE];
-		//делаем операцию отдельно для первого узла, потому что файлы из узла со старым storage_id перейдут 
-		sprintf(dup_dir, "%s/%s", ((storage))->destination, duplicate);//
-		copy_all(dup_dir, (storage)->destination, full_dir_list);
+        if (node_id == 0) {
+            make_duplicates_for_all();
+            return;
+        }
+        // Отдельно обработаем нулевой узел
+        char current_dup_path[FULL_PATH_MAX_SIZE];
+        sprintf(current_dup_path, "%s/duplicates", storage[0].destination);
+        // Получили список текущих копий
+        get_dir_list(current_dup_dir_list, current_dup_path);
+        // Копируем из копий в НЕкопии
+        copy_all(current_dup_path, storage[0].destination, current_dup_dir_list);
 		make_duplicates_for_all();
 }
 
