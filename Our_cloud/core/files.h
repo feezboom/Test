@@ -32,7 +32,7 @@ int is_dir(char* filename, char* path) {
 // Возвращает список файлов в папке, без внутренних папок
 void get_dir_list(char* future_dir_list, const char* current_path_) {
     char current_path[FULL_PATH_MAX_SIZE];
-    sprintf(current_path, current_path_);
+    sprintf(current_path, "%s", current_path_);
 // get_current_dir_path(current_path);
     strcpy(future_dir_list, "");
 
@@ -189,7 +189,7 @@ int clean_directory(const char *path) {
             size_t len;
 
             /* Skip the names "." and ".." as we don't want to recurse on them. */
-            if (!strcmp(p->d_name, ".") || !strcmp(p->d_name, "..")) {
+            if (!strcmp(p->d_name, ".") || !strcmp(p->d_name, "..") || !strcmp(p->d_name, "duplicates") ) { //todo ?
                 continue;
             }
 
@@ -216,8 +216,34 @@ int clean_directory(const char *path) {
     return r;
 }
 
-void make_duplicates_for_all() {}
-
-void rehash_after_remove() {}
+void make_duplicates_for_all() {
+	char full_dir_list[FULL_PATH_MAX_SIZE];
+	get_full_dir_list(full_dir_list);
+	const char * duplicate = "duplicates";
+	for (i = 0; i < storage_size; i++){
+		char cur_dup_dir[FULL_PATH_MAX_SIZE];
+		char cur_dir[FULL_PATH_MAX_SIZE];
+		sprintf(cur_dir, "%s", (storage + i)->destination);
+		sprintf(cur_dup_dir, "%s/%s", (storage + (i + 1)%storage_size)->destination, duplicate);
+		clean_directory(cur_dup_dir);
+		copy_all(cur_dir, cur_dup_dir, full_dir_list);
+	}
+}
+void rehash_after_remove(int node_id) {
+		const char * duplicate = "duplicates";
+		char full_dir_list[FULL_PATH_MAX_SIZE];
+		get_full_dir_list(full_dir_list);
+		for (i = node_id; i < storage_size; i++){
+			clean_directory((storage + i)->destination);
+			char dup_dir[FULL_PATH_MAX_SIZE];
+			sprintf(dup_dir, "%s/%s", ((storage + i))->destination, duplicate);
+			copy_all(dup_dir, (storage + i)->destination, full_dir_list);
+		}
+		char dup_dir[FULL_PATH_MAX_SIZE];
+		//делаем операцию отдельно для первого узла, потому что файлы из узла со старым storage_id перейдут 
+		sprintf(dup_dir, "%s/%s", ((storage))->destination, duplicate);//
+		copy_all(dup_dir, (storage)->destination, full_dir_list);
+		make_duplicates_for_all();
+}
 
 #endif //OUR_CLOUD_FILES_H

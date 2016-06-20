@@ -43,7 +43,7 @@ void remove_node(int node_id) {
     for (i = node_id; i < storage_size - 1; i++){
         (storage + i)->destination = (storage + i + 1)->destination;
     }
-    realloc(storage, (storage_size - 1) * sizeof(node));
+    storage = realloc(storage, (storage_size - 1) * sizeof(node));
     --storage_size;
 }
 void init_storage(int number, char** destinations) {

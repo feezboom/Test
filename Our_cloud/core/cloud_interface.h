@@ -182,8 +182,8 @@ void perform_deactivate(char* node_id, int sock) {
     clean_directory(path_this_dup); // Здесь должны лежать дубликаты предыдущего - они потерялись
     copy_all(path_prev, path_this_dup, prev_list); // Дубликаты предыдущего лежат тут
     // todo
+    * */
     send_message("Deactivation success!\n", sock);
-    */
     return;
 }
 
