@@ -216,4 +216,7 @@ int clean_directory(const char *path) {
     return r;
 }
 
+void make_duplicates_for_all() {}
+
+
 #endif //OUR_CLOUD_FILES_H

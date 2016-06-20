@@ -152,6 +152,8 @@ void perform_deactivate(char* node_id, int sock) {
     clean_directory(path);
     remove_node(id);
 
+    rehash_after_remove(id);
+/*
     const char* path_next = storage[(id+1)%storage_size].destination;
     char path_next_dup[FULL_PATH_MAX_SIZE]; // Путь к дубликатам i+1
 
@@ -181,6 +183,7 @@ void perform_deactivate(char* node_id, int sock) {
     copy_all(path_prev, path_this_dup, prev_list); // Дубликаты предыдущего лежат тут
     // todo
     send_message("Deactivation success!\n", sock);
+    */
     return;
 }
 
