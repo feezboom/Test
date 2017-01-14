@@ -21,3 +21,28 @@ getlist - получить список файлов на облаке
 
 ./run ~bla/dir1 ~bla/dir2 ~bla/dir3 ...
 
+================================================================
+
+## A very simple cloud file storage.
+
+Store provides several nodes. The user can upload files to the system and download them after that.
+Every node maintains a set of files in the local repository. Each file is stored on two nodes.
+Disabling a node, additional copies will be created, extra will be deleted. Failure-resistant system.
+
+### Client runs :
+Run with option - ip:port; Port is set as 2288
+
+./client 127.0.0.1:2288
+
+Available functions:
+
+download filename - download a file from the server 
+
+upload filename to upload a file to the server
+
+getlist - get a list of files on the cloud
+
+### Server runs : 
+Run with options - places to store files (nodes).
+
+./run ~bla/dir1 ~bla/dir2 ~bla/dir3 ...
